@@ -72,7 +72,22 @@ Toggling "Night vision" tints the whole screen (camera feed included) deep
 red, the standard trick astronomers use to read a screen or app without
 ruining eyes that have adapted to the dark.
 
-## Running it
+## Try it on your phone
+
+Camera and orientation sensors only work over HTTPS (see below), so a
+GitHub Actions workflow (`.github/workflows/deploy-pages.yml`) builds and
+publishes this app to GitHub Pages — a real HTTPS URL you can open directly
+on a phone, no tunnel or local server needed. It runs the test suite before
+every deploy, so a broken build never goes live.
+
+**One-time setup** (repo admin, not something this workflow can do itself):
+in this repo's **Settings → Pages**, set **Source** to **GitHub Actions**.
+After that, every push to `main` or this branch deploys automatically —
+check the **Actions** tab for the run and its live URL, or **Settings →
+Pages** once it's deployed. It'll be at
+`https://<github-username>.github.io/Stargazer/`.
+
+## Running it locally
 
 ```bash
 npm install

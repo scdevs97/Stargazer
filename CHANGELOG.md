@@ -5,6 +5,14 @@ Notable changes to the Stargazer prototype, newest first.
 ## Unreleased
 
 ### Added
+- **GitHub Pages deploy workflow** (`.github/workflows/deploy-pages.yml`):
+  runs the test suite, then builds and publishes to GitHub Pages on every
+  push to `main` or this branch, so the app has a real HTTPS URL that
+  works on an actual phone without a tunnel or local server (camera and
+  orientation sensors require a secure context, which `localhost` alone
+  doesn't give you on a separate physical device). Requires a one-time
+  repo setting (Settings → Pages → Source: GitHub Actions) — documented
+  in the README.
 - **Roll (tilt) compensation** in the projection math: the overlay now
   stays aligned with the live camera image even when the phone is twisted
   around its own optical axis, not just panned or tilted up/down. Derived
