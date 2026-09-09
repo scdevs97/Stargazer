@@ -14,8 +14,39 @@ export type OrientationPermission = "unknown" | "unnecessary" | "granted" | "den
 export interface OrientationState {
   headingDeg: number | null; // compass heading of the back camera, 0=N, clockwise
   pitchDeg: number | null; // elevation above horizon
+  rollDeg: number | null; // twist around the camera's own optical axis
   absolute: boolean;
   permission: OrientationPermission;
+}
+
+const D2R = Math.PI / 180;
+const R2D = 180 / Math.PI;
+
+/**
+ * How far the phone is twisted around the camera's optical axis, derived
+ * purely from the tilt angles (beta, gamma) -- deliberately independent of
+ * compass heading (alpha), because rotating around a vertical axis doesn't
+ * change how tilted the horizon looks in the viewfinder.
+ *
+ * Geometrically this is the direction of the world's zenith as seen in the
+ * device's own (right, top) plane: the third row of the standard W3C
+ * device-orientation rotation matrix, which has no alpha term.
+ *
+ * NOTE: implemented from first principles and covered by unit tests for
+ * its structural properties (zero at beta=90/gamma=0, antisymmetric in
+ * gamma), but the sign convention has not been validated against a real
+ * device -- treat as best-effort pending field testing. A real roll motion
+ * while pointed at the horizon shifts the sensor's beta reading away from
+ * 90 in tandem with gamma; this formula uses both, so it tracks that
+ * correctly even though holding beta artificially fixed at exactly 90
+ * always reports zero roll (see the unit tests).
+ */
+export function rollDegFromTilt(betaDeg: number, gammaDeg: number): number {
+  const b = betaDeg * D2R;
+  const g = gammaDeg * D2R;
+  const zenithInDeviceX = -Math.cos(b) * Math.sin(g);
+  const zenithInDeviceY = Math.sin(b);
+  return Math.atan2(zenithInDeviceX, zenithInDeviceY) * R2D;
 }
 
 /**
@@ -46,6 +77,7 @@ export function useDeviceOrientation() {
   const [state, setState] = useState<OrientationState>({
     headingDeg: null,
     pitchDeg: null,
+    rollDeg: null,
     absolute: false,
     permission: "unknown",
   });
@@ -72,11 +104,13 @@ export function useDeviceOrientation() {
       // Elevation of the back camera above the horizon, assuming the phone
       // is held upright (portrait) like a viewfinder, with minimal roll.
       const pitch = Math.max(-90, Math.min(90, beta - 90));
+      const roll = rollDegFromTilt(beta, gamma);
 
       setState((s) => ({
         ...s,
         headingDeg: heading,
         pitchDeg: pitch,
+        rollDeg: roll,
         absolute: e.absolute === true || typeof e.webkitCompassHeading === "number",
       }));
     };

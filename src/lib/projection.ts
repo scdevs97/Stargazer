@@ -39,6 +39,19 @@ function normalize(v: Vec3): Vec3 {
   return { x: v.x / len, y: v.y / len, z: v.z / len };
 }
 
+/** Rotate vector v by angle (radians) around unit axis k, via Rodrigues' formula. */
+function rotateAroundAxis(v: Vec3, k: Vec3, angle: number): Vec3 {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  const kxv = cross(k, v);
+  const kdotv = dot(k, v);
+  return {
+    x: v.x * c + kxv.x * s + k.x * kdotv * (1 - c),
+    y: v.y * c + kxv.y * s + k.y * kdotv * (1 - c),
+    z: v.z * c + kxv.z * s + k.z * kdotv * (1 - c),
+  };
+}
+
 export interface Camera {
   headingDeg: number; // compass heading the camera points at, 0=N, 90=E
   pitchDeg: number; // elevation above horizon, 90=straight up, -90=straight down
@@ -46,6 +59,14 @@ export interface Camera {
   vFovDeg: number; // vertical field of view
   screenWidth: number;
   screenHeight: number;
+  /**
+   * How far the phone is twisted around the camera's own optical axis
+   * (e.g. held tilted like a head-tilt, or rotated into landscape),
+   * in degrees. 0 = no roll, screen "up" points toward the zenith's
+   * projection the way earlier prototype versions always assumed.
+   * Optional — omit (or pass 0) to keep that original behavior.
+   */
+  rollDeg?: number;
 }
 
 export interface ProjectedPoint {
@@ -56,8 +77,6 @@ export interface ProjectedPoint {
 
 /**
  * Project a target Alt/Az into screen pixel coordinates for the given camera.
- * Assumes the phone is held with no roll (upright portrait/landscape), which
- * is a reasonable simplification for a v1 prototype.
  */
 export function project(altDeg: number, azDeg: number, camera: Camera): ProjectedPoint {
   const forward = altAzToVector(camera.pitchDeg, camera.headingDeg);
@@ -71,7 +90,17 @@ export function project(altDeg: number, azDeg: number, camera: Camera): Projecte
     right = { x: 1, y: 0, z: 0 };
   }
   right = normalize(right);
-  const up = normalize(cross(right, forward));
+  let up = normalize(cross(right, forward));
+
+  // The basis above always treats "screen up" as pointing toward the
+  // zenith's projection (zero roll). If the phone is twisted around the
+  // camera axis, spin the (right, up) pair by that same amount so the
+  // overlay stays aligned with what the tilted camera image actually shows.
+  if (camera.rollDeg) {
+    const rollRad = camera.rollDeg * DEG2RAD;
+    right = rotateAroundAxis(right, forward, rollRad);
+    up = rotateAroundAxis(up, forward, rollRad);
+  }
 
   const target = altAzToVector(altDeg, azDeg);
   const sx = dot(target, right);
