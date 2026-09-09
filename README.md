@@ -4,6 +4,18 @@ A prototype AR sky-identification app: point your phone's camera at the sky
 and it labels every star that *should* be in frame — whether or not it's
 actually bright enough to see right now.
 
+## Demo
+
+These are real screenshots of the running app (captured headlessly, so the
+"camera feed" is Chromium's synthetic test pattern instead of an actual sky —
+on a real phone that background is your live camera view). Location was
+mocked to New York City at night; same field of view and heading in both.
+
+| All stars in frame | Only visible ones |
+| --- | --- |
+| ![All stars in frame: 6 stars labeled, 5 dimmed because they're too faint for the current brightness cutoff](docs/demo-all-stars.png) | ![Only visible ones: same view filtered down to the 1 star that clears the brightness cutoff](docs/demo-visible-only.png) |
+| Every catalog star geometrically in view. Dimmer stars are drawn faded because they don't clear the brightness cutoff. | Same view, same cutoff (magnitude 1.0) — filtered to just the star that would actually be visible. |
+
 ## How it works
 
 1. **Camera** (`getUserMedia`) fills the background, like a normal camera app.
