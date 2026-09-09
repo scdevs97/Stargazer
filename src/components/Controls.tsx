@@ -11,6 +11,10 @@ export interface ControlsProps {
   manualMode: boolean;
   onExitManual: () => void;
   starCount: number;
+  nightMode: boolean;
+  onNightModeChange: (v: boolean) => void;
+  showConstellations: boolean;
+  onShowConstellationsChange: (v: boolean) => void;
 }
 
 export function Controls({
@@ -24,6 +28,10 @@ export function Controls({
   manualMode,
   onExitManual,
   starCount,
+  nightMode,
+  onNightModeChange,
+  showConstellations,
+  onShowConstellationsChange,
 }: ControlsProps) {
   return (
     <div
@@ -84,6 +92,15 @@ export function Controls({
           onChange={(e) => onHFovChange(parseFloat(e.target.value))}
         />
       </label>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={() => onShowConstellationsChange(!showConstellations)} style={pillStyle(showConstellations)}>
+          Constellation lines
+        </button>
+        <button onClick={() => onNightModeChange(!nightMode)} style={pillStyle(nightMode)}>
+          Night vision
+        </button>
+      </div>
 
       {manualMode && (
         <button onClick={onExitManual} style={pillStyle(false)}>

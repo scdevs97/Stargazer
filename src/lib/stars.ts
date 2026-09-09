@@ -106,4 +106,11 @@ export const STARS: Star[] = [
   { name: "Megrez", constellation: "Ursa Major", raHours: 12.2571, decDeg: 57.0326, mag: 3.31 },
   { name: "Thuban", constellation: "Draco", raHours: 14.0731, decDeg: 64.3758, mag: 3.65 },
   { name: "Alcor", constellation: "Ursa Major", raHours: 13.4202, decDeg: 54.9879, mag: 4.01 },
+
+  // Added to complete recognizable constellation figures (see constellations.ts).
+  { name: "Merak", constellation: "Ursa Major", raHours: 11.0307, decDeg: 56.3825, mag: 2.37 },
+  { name: "Imai", constellation: "Crux", raHours: 12.2524, decDeg: -58.7489, mag: 2.80 },
+  { name: "Navi", constellation: "Cassiopeia", raHours: 0.9451, decDeg: 60.7167, mag: 2.47 },
+  { name: "Ruchbah", constellation: "Cassiopeia", raHours: 1.4303, decDeg: 60.2353, mag: 2.68 },
+  { name: "Segin", constellation: "Cassiopeia", raHours: 1.9066, decDeg: 63.6700, mag: 3.35 },
 ];
